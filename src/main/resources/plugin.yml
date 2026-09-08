@@ -1,0 +1,6 @@
+name: MiniHudBridge
+version: ${version}
+main: verymc.top.minihudbridge.MiniHudBridge
+description: Servux Structure Bounding Box bridge for MiniHUD
+author: VeryMC
+api-version: '26.1'
