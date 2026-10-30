@@ -1,0 +1,22 @@
+name: MiniHudBridge
+
+version: ${version}
+
+main: verymc.top.minihudbridge.MiniHudBridge
+
+description: Servux Structure Bounding Box bridge for MiniHUD
+
+author: VeryMC
+
+api-version: '26.2'
+
+commands:
+  shadowitem:
+    description: Registra un ShadowItem en un slot del hotbar
+    usage: /shadowitem <1-9>
+    permission: minihudbridge.shadowitem
+
+permissions:
+  minihudbridge.shadowitem:
+    description: Permite usar /shadowitem
+    default: op

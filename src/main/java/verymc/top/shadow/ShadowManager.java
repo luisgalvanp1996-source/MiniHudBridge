@@ -1,4 +1,4 @@
-package verymc.top.minihudbridge.shadow;
+package verymc.top.shadow;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -8,165 +8,201 @@ import java.util.UUID;
 
 public final class ShadowManager {
 
+    private final JavaPlugin plugin;
+    private final ShadowStorage storage;
 
-private final JavaPlugin plugin;
-private final ShadowStorage storage;
+    private final List<ShadowGroup> groups =
+            new ArrayList<>();
 
-private final List<ShadowGroup> groups = new ArrayList<>();
+    public ShadowManager(JavaPlugin plugin) {
+        this.plugin = plugin;
+        this.storage = new ShadowStorage(plugin);
 
-public ShadowManager(JavaPlugin plugin) {
-    this.plugin = plugin;
-    this.storage = new ShadowStorage(plugin);
+        load();
+    }
 
-    load();
-}
+    /**
+     * Carga todos los Shadows guardados en shadows.yml.
+     */
+    public void load() {
 
-/**
- * Carga todos los Shadows guardados en shadows.yml.
- */
-public void load() {
-    groups.clear();
-    groups.addAll(storage.load());
+        groups.clear();
 
-    plugin.getLogger().info(
-            "Shadow Items cargados: " + groups.size()
-    );
-}
+        groups.addAll(
+                storage.load()
+        );
 
-/**
- * Guarda todos los Shadows actuales.
- */
-public void save() {
-    storage.save(groups);
-}
+        plugin.getLogger().info(
+                "Shadow Items cargados: "
+                        + groups.size()
+        );
+    }
 
-/**
- * Crea un nuevo ShadowGroup.
- */
-public ShadowGroup createGroup() {
+    /**
+     * Guarda todos los Shadows actuales.
+     */
+    public void save() {
+        storage.save(groups);
+    }
 
-    ShadowGroup group =
-            new ShadowGroup(UUID.randomUUID());
+    /**
+     * Crea un nuevo ShadowGroup.
+     */
+    public ShadowGroup createGroup() {
 
-    groups.add(group);
+        ShadowGroup group =
+                new ShadowGroup(
+                        UUID.randomUUID()
+                );
 
-    save();
+        groups.add(group);
 
-    return group;
-}
-
-/**
- * Elimina un ShadowGroup.
- */
-public boolean removeGroup(UUID id) {
-
-    boolean removed =
-            groups.removeIf(
-                    group -> group.getId().equals(id)
-            );
-
-    if (removed) {
         save();
+
+        return group;
     }
 
-    return removed;
-}
+    /**
+     * Elimina un ShadowGroup.
+     */
+    public boolean removeGroup(UUID id) {
 
-/**
- * Busca un Shadow por su UUID.
- */
-public ShadowGroup getGroup(UUID id) {
+        boolean removed =
+                groups.removeIf(
+                        group ->
+                                group.getId()
+                                        .equals(id)
+                );
 
-    for (ShadowGroup group : groups) {
-
-        if (group.getId().equals(id)) {
-            return group;
+        if (removed) {
+            save();
         }
+
+        return removed;
     }
 
-    return null;
-}
+    /**
+     * Elimina TODOS los ShadowGroups.
+     *
+     * No modifica físicamente los ítems.
+     * Solamente elimina las sincronizaciones.
+     */
+    public int removeAllGroups() {
 
-/**
- * Devuelve todos los Shadows.
- */
-public List<ShadowGroup> getGroups() {
-    return List.copyOf(groups);
-}
+        int count =
+                groups.size();
 
-/**
- * Busca un Shadow que pertenezca a un slot
- * concreto del inventario de un jugador.
- */
-public ShadowGroup findPlayerShadow(
-        UUID playerUuid,
-        int slot
-) {
+        groups.clear();
 
-    for (ShadowGroup group : groups) {
+        save();
 
-        for (ShadowEndpoint endpoint :
-                group.getEndpoints()) {
+        return count;
+    }
+
+    /**
+     * Busca un Shadow por su UUID.
+     */
+    public ShadowGroup getGroup(UUID id) {
+
+        for (ShadowGroup group : groups) {
 
             if (
-                    endpoint.getType()
-                            == ShadowEndpoint.Type.PLAYER
-                            &&
-                    playerUuid.equals(
-                            endpoint.getPlayerUuid()
-                    )
-                            &&
-                    endpoint.getPlayerSlot() == slot
+                    group.getId()
+                            .equals(id)
             ) {
                 return group;
             }
         }
+
+        return null;
     }
 
-    return null;
-}
+    /**
+     * Devuelve todos los Shadows.
+     */
+    public List<ShadowGroup> getGroups() {
+        return List.copyOf(groups);
+    }
 
-/**
- * Busca un Shadow asociado a un bloque/contenedor.
- */
-public ShadowGroup findContainerShadow(
-        String world,
-        int x,
-        int y,
-        int z,
-        int slot
-) {
+    /**
+     * Busca un Shadow que pertenezca a un slot
+     * concreto del inventario de un jugador.
+     */
+    public ShadowGroup findPlayerShadow(
+            UUID playerUuid,
+            int slot
+    ) {
 
-    for (ShadowGroup group : groups) {
+        for (ShadowGroup group : groups) {
 
-        for (ShadowEndpoint endpoint :
-                group.getEndpoints()) {
-
-            if (
-                    endpoint.getType()
-                            == ShadowEndpoint.Type.CONTAINER
-                            &&
-                    world.equals(endpoint.getWorld())
-                            &&
-                    endpoint.getX() == x
-                            &&
-                    endpoint.getY() == y
-                            &&
-                    endpoint.getZ() == z
-                            &&
-                    endpoint.getContainerSlot() == slot
+            for (
+                    ShadowEndpoint endpoint :
+                            group.getEndpoints()
             ) {
-                return group;
+
+                if (
+                        endpoint.getType()
+                                == ShadowEndpoint.Type.PLAYER
+                                &&
+                        playerUuid.equals(
+                                endpoint.getPlayerUuid()
+                        )
+                                &&
+                        endpoint.getPlayerSlot()
+                                        == slot
+                ) {
+                    return group;
+                }
             }
         }
+
+        return null;
     }
 
-    return null;
-}
+    /**
+     * Busca un Shadow asociado a un bloque/contenedor.
+     */
+    public ShadowGroup findContainerShadow(
+            String world,
+            int x,
+            int y,
+            int z,
+            int slot
+    ) {
 
-public ShadowStorage getStorage() {
-    return storage;
-}
+        for (ShadowGroup group : groups) {
 
+            for (
+                    ShadowEndpoint endpoint :
+                            group.getEndpoints()
+            ) {
 
+                if (
+                        endpoint.getType()
+                                == ShadowEndpoint.Type.CONTAINER
+                                &&
+                        world.equals(
+                                endpoint.getWorld()
+                        )
+                                &&
+                        endpoint.getX() == x
+                                &&
+                        endpoint.getY() == y
+                                &&
+                        endpoint.getZ() == z
+                                &&
+                        endpoint.getContainerSlot()
+                                        == slot
+                ) {
+                    return group;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public ShadowStorage getStorage() {
+        return storage;
+    }
 }

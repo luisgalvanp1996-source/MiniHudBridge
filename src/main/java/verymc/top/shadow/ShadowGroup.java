@@ -1,4 +1,4 @@
-package verymc.top.minihudbridge.shadow;
+package verymc.top.shadow;
 
 import net.minecraft.world.item.ItemStack;
 

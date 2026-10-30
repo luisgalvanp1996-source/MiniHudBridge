@@ -144,37 +144,40 @@ public final class ServuxStructuresHandler
         sendPacket(player, packet);
     }
 
-    private net.minecraft.nbt.CompoundTag createMetadata() {
-        net.minecraft.nbt.CompoundTag nbt =
-                new net.minecraft.nbt.CompoundTag();
 
-        nbt.putString(
-                "name",
-                "structure_bounding_boxes"
-        );
+private net.minecraft.nbt.CompoundTag createMetadata() {
+    net.minecraft.nbt.CompoundTag nbt =
+            new net.minecraft.nbt.CompoundTag();
 
-        nbt.putString(
-                "id",
-                CHANNEL
-        );
+    nbt.putString(
+            "name",
+            "structure_bounding_boxes"
+    );
 
-        nbt.putInt(
-                "version",
-                ServuxStructuresPacket.PROTOCOL_VERSION
-        );
+    nbt.putString(
+            "id",
+            CHANNEL
+    );
 
-        nbt.putString(
-                "servux",
-                "servux-fabric-26.1.2-0.10.6"
-        );
+    nbt.putInt(
+            "version",
+            ServuxStructuresPacket.PROTOCOL_VERSION
+    );
 
-        nbt.putInt(
-                "timeout",
-                600
-        );
+    // MiniHUD Fabric para Minecraft 26.2
+    nbt.putString(
+            "servux",
+            "servux-fabric-26.2-0.11.1"
+    );
 
-        return nbt;
-    }
+    nbt.putInt(
+            "timeout",
+            600
+    );
+
+    return nbt;
+}
+
 
     public void sendPacket(
         Player player,

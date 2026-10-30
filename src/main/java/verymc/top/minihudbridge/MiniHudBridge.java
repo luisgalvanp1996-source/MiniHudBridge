@@ -1,8 +1,8 @@
 package verymc.top.minihudbridge;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import verymc.top.minihudbridge.shadow.ShadowCommand;
-import verymc.top.minihudbridge.shadow.ShadowManager;
+import verymc.top.shadow.ShadowCommand;
+import verymc.top.shadow.ShadowManager;
 
 public final class MiniHudBridge extends JavaPlugin {
 
